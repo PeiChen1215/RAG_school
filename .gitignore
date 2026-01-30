@@ -1,0 +1,8 @@
+/.venv
+__pycache__/
+*.pyc
+.DS_Store
+data/faiss.index
+data/metadata.json
+data/chunks.json
+env/
