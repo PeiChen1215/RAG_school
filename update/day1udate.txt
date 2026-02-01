@@ -1,0 +1,31 @@
+Day 1 开发日志
+日期：2026-02-01
+
+概览：
+- 提取并记录项目需求，生成 `REQS.md`。
+- 设计并写入项目架构说明：`Project_Architecture_Design.txt`。
+- 添加快速上手文档：`ONBOARDING.md`（包含 Conda/venv、模型下载与运行示例）。
+
+代码与仓库变更：
+- 创建项目骨架：新增 `backend/`、`frontend/`、`scripts/`、`config/`、`docs/` 等目录及示例文件。
+- 更新并清理依赖：修改 `requirements.txt`，添加 `environment.yml`（用于 Conda + GPU 环境）。
+- 本地创建虚拟环境并安装依赖（`.venv`），已安装 `faiss-cpu`（Windows），`faiss-cuda` 未安装（建议 Linux+Conda）。
+
+模型与测试：
+- 成功下载并测试嵌入模型 `all-MiniLM-L6-v2`，向量维度 384。
+- 成功下载并测试小型生成模型 `EleutherAI/gpt-neo-125M`，用于本地演示。
+- 尝试下载 `THUDM/chatglm3-6b` 时遇到 gated/权限与体积问题（需 HF_TOKEN 和大量磁盘/内存），暂缓。
+
+提交与发布：
+- 已将上述更改提交到本地仓库（提交信息："Update project files"，提交 id: c24caa5），并已强制推送覆盖远程 `main` 分支（远程：https://github.com/PeiChen1215/RAG_school.git）。
+
+问题与建议：
+- 若需在本地使用 ChatGLM3-6B，请准备 HF_TOKEN、Linux 服务器与足够磁盘/内存，或使用量化/托管版本。
+- 建议先用小模型完成端到端流程（数据摄取 → 索引 → 检索 → 生成），验证后再上大模型。 
+
+下一步计划（优先级）：
+1. 将 `gpt-neo-125M` 接入后端示例 API 并更新 Streamlit 演示（可快速完成）。
+2. 实现 `scripts/indexing/build_index.py` 完整流程并构建小规模索引用于演示。 
+3. 若需要，帮助团队成员以 Conda 在 Linux 上部署 GPU 环境。
+
+记录人：自动生成（由助理脚本）
