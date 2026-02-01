@@ -11,3 +11,4 @@ python-multipart
 tqdm
 torch
 accelerate
+bitsandbytes

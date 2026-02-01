@@ -1,0 +1,77 @@
+Campus RAG — 项目架构设计
+
+概述
+----
+本文档说明 Campus RAG 项目的高层架构与脚手架。采用模块化设计以实现职责分离：后端 API 与核心逻辑、前端演示、数据处理/索引/评估脚本、数据与模型制品、配置、测试和部署相关文件。
+
+顶层结构（建议）
+-----------------
+campus-rag/
+├── backend/
+│   ├── api/            # FastAPI 路由与应用
+│   ├── core/           # RAG 协调逻辑：检索 + 生成
+│   ├── models/         # Pydantic 模型与数据结构
+│   └── services/       # 嵌入、索引管理、摄取等服务实现
+├── frontend/
+│   ├── streamlit_app/  # Streamlit 演示应用与组件
+│   └── static/         # 静态资源（图标、样式等）
+├── scripts/
+│   ├── data_processing/  # 文本抽取与分段
+│   ├── indexing/         # 索引构建与更新脚本
+│   └── evaluation/       # 评估（检索/生成）脚本
+├── data/
+│   ├── raw/              # 原始文档（pdf/txt）
+│   ├── processed/        # 清洗后文本
+│   └── vector_store/     # 向量索引（faiss）与映射
+├── models/               # 本地模型文件或模型指针配置
+├── config/               # 默认配置（default.yaml，logging.conf）
+├── tests/                # 单元/集成测试
+├── docker/               # Dockerfile 与 compose
+├── docs/                 # 架构与运行手册
+└── requirements.txt
+
+设计要点
+-------
+
+- 后端（Backend）
+  - 使用 FastAPI 提供 HTTP 接口：健康检查、查询、运维管理（如重建索引、上传数据）。
+  - `core/` 包含 `rag.py`（流程编排）、`retrieval.py`（向量检索封装）、`generation.py`（调用生成模型）。
+  - `services/` 封装具体实现：`embed_service.py`、`index_service.py`、`ingest_service.py`，便于测试与替换。
+
+- 数据流（Data flow）
+  1. `scripts/data_processing/extract_text.py` 将 `data/raw/` 中的文档抽取为 `data/processed/`。
+  2. `scripts/data_processing/split_chunks.py` 将处理后文本分段并输出 `data/chunks.json`。
+  3. `scripts/indexing/build_index.py` 对分段计算嵌入并构建 Faiss 索引，保存到 `data/vector_store/`。
+  4. 后端加载索引并提供检索服务。
+
+- 前端（Frontend）
+  - 使用 Streamlit 快速搭建演示界面，调用后端查询并展示答案与来源；长期可替换为更复杂的前端（如 React）。
+
+- 模型与索引（Models & Index）
+  - 嵌入：优先使用 `sentence-transformers` 或可配置的远程嵌入 API，模型配置在 `config/default.yaml` 中。
+  - 索引：默认使用本地 Faiss（`data/vector_store/`）。若需 GPU，请在 Linux 下通过 Conda 安装 `faiss-cuda`；生产可考虑 Milvus 或 PGVector。
+
+- 配置与密钥管理（Configuration & Secrets）
+  - 将非敏感配置保存在 `config/default.yaml`。
+  - API 密钥和敏感信息使用环境变量或密钥管理服务，避免提交到仓库。
+
+- 测试与 CI（Tests & CI）
+  - 在 `tests/` 编写单元与集成测试，覆盖 ingest→index→query 流程的关键路径。
+  - CI 流程应包含代码风格检查、单元测试和对最小 Docker 镜像的构建/自检。
+
+初始脚手架（Initial scaffold）
+----------------------------
+建议优先创建以下最小占位文件以便快速启动开发：
+- `backend/api/v1/routes.py`
+- `backend/core/rag.py`, `retrieval.py`, `generation.py`
+- `backend/services/*` 与 `backend/models/schemas.py`
+- `frontend/streamlit_app/app.py`
+- `scripts/data_processing/*`, `scripts/indexing/*`, `scripts/evaluation/*`
+
+部署（Deployment）
+------------------
+- 提供 `docker/Dockerfile.backend` 与 `docker/Dockerfile.frontend` 以及 `docker-compose.yml`，用于本地演示与快速验证。
+
+备注（Notes）
+-------------
+- 本脚手架仅为启动开发提供最小结构。后续实现应基于模块化原则扩展服务并增加单元与集成测试。

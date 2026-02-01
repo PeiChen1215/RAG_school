@@ -1,0 +1,10 @@
+# Default configuration for Campus RAG
+model:
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  generator_model: gpt-neo-125m
+index:
+  path: data/vector_store/faiss.index
+  top_k: 5
+chunking:
+  size: 500
+  overlap: 50
