@@ -1,0 +1,14 @@
+streamlit
+fastapi
+uvicorn
+pypdf
+pdfplumber
+sentence-transformers
+faiss-cpu
+transformers[torch]
+datasets
+python-multipart
+tqdm
+torch
+accelerate
+bitsandbytes
